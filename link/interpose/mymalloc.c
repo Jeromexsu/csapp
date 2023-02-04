@@ -38,11 +38,15 @@ void __wrap_free(void *ptr) {
 #endif
 
 #ifdef RUNTIME
+#define _GNU_SOURCE
 #include <stdio.h>
 #include <stdlib.h>
 #include <dlfcn.h>
 /* wrapper function of malloc*/
 void *malloc(size_t size) {
+    static __thread int print_times = 0;
+    print_times++;
+
     // pointer of libc malloc
     void *(*mallocp)(size_t size);
     char *error;
@@ -54,11 +58,15 @@ void *malloc(size_t size) {
     }
     // call libc malloc
     char* ptr= mallocp(size);
-    printf("malloc(%d) = %p\n", (int)size, ptr);
+    if(print_times == 1) printf("malloc(%d) = %p\n", (int)size, ptr);
+    print_times = 0;
     return ptr;
 }
 /* wrapper function of free */
 void free(void* ptr) {
+    static __thread int print_times = 0;
+    print_times++;
+
     void(*freep)(void *) = NULL;
     char* error;
 
@@ -70,8 +78,8 @@ void free(void* ptr) {
         exit(1);
     }
     freep(ptr);
-    printf("free(%p)\n",ptr);
-
+    if(print_times == 1) printf("free(%p)\n",ptr);
+    print_times = 0;
 }
 
 #endif
