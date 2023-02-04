@@ -1,0 +1,6 @@
+{
+    "files.associations": {
+        "_int8_t.h": "c",
+        "_int32_t.h": "c"
+    }
+}
